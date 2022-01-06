@@ -6,7 +6,7 @@ import GHC.Generics
 import Data.Aeson
 
 data Todo = Todo
-  { todoId :: Int
+  { todoId :: Integer
   , title  :: String
   , done   :: Bool
   } deriving (Generic, FromJSON, ToJSON)
