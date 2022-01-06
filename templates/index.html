@@ -17,9 +17,9 @@
 getTodoAll(function(todoList){
   var table = $("table#js-todo-list");
   todoList.forEach(function(todo){
-    var title = $("<td />").text(todo.title);
+    var title = $("<td />").text(todo._title);
     var checkbox = $("<input />").attr("type", "checkbox");
-    if (todo.done) {
+    if (todo._done) {
       checkbox.attr("checked", "checked");
     }
     var done  = $("<td />").append(checkbox);

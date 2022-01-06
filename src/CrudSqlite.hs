@@ -10,16 +10,16 @@ import Database.SQLite.Simple.FromRow
 import Model
 
 instance FromRow Todo where
-  fromRow = Todo <$> field <*> field <*> field
+  fromRow = Todo <$> field <*> field <*> field <*> field
 
 instance ToRow Todo where
-  toRow (Todo i t d) = toRow (i, t ,d)
+  toRow (Todo i t d c) = toRow (i, t ,d, c)
 
 todoMigrateQuery :: String -> Query 
 todoMigrateQuery table = 
   "create table if not exists" <> 
   Query (T.pack table) <> 
-  " (id INTEGER PRIMARY KEY, title TEXT NOT NULL, done TEXT NOT NULL)"
+  " (id INTEGER PRIMARY KEY, title TEXT NOT NULL, done TEXT NOT NULL, created_at TEXT DEFAULT datetime(CURRENT_TIMESTAMP, /'utc/') )"
 
 openDatabase :: (MonadIO m, MonadCatch m) => m Connection -> (Connection -> m a ) -> m a
 openDatabase ioConnect connectIO = ioConnect >>= (\conn -> connectIO conn <* liftIO (close conn))
@@ -76,6 +76,6 @@ updateTodo path table i (t,b) errorHandl = do
 deleteTodo :: (MonadIO m, MonadCatch m) => String -> String -> Integer -> [Handler m ()] -> m ()
 deleteTodo path table i errorHandl = do
     openDatabase (liftIO $ open path) $ \conn -> 
-      liftIO (liftIO (executeNamed conn ("DLETE from " <> Query (T.pack table) <> " WHERE id = :id") [":id" := i]))
+      liftIO (liftIO (execute conn ("DELETE FROM " <> Query (T.pack table) <>  " WHERE id = ?") (Only i)))
       `catches` 
       errorHandl

@@ -51,7 +51,7 @@ server = home
        :<|> deleteTodoId
   where
     home = liftIO $ B.readFile "templates/index.html"
-    getToDoAll = pure [Todo 1 "sample" False]
+    getToDoAll = pure [Todo 1 "sample" False ""]
     postTodo todo = pure todo
     putTodoId id todo = pure ()
     deleteTodoId id = pure ()
