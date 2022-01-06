@@ -17,9 +17,9 @@ instance ToRow Todo where
 
 todoMigrateQuery :: String -> Query 
 todoMigrateQuery table = 
-  "create table if not exists" <> 
+  "create table if not exists " <> 
   Query (T.pack table) <> 
-  " (id INTEGER PRIMARY KEY, title TEXT NOT NULL, done TEXT NOT NULL, created_at TEXT DEFAULT datetime(CURRENT_TIMESTAMP, /'utc/') )"
+  " (id INTEGER PRIMARY KEY, title TEXT NOT NULL, done INTEGER NOT NULL, created_at TIMESTAMP DEFAULT (datetime(CURRENT_TIMESTAMP,'localtime')) )"
 
 openDatabase :: (MonadIO m, MonadCatch m) => m Connection -> (Connection -> m a ) -> m a
 openDatabase ioConnect connectIO = ioConnect >>= (\conn -> connectIO conn <* liftIO (close conn))
@@ -45,31 +45,31 @@ selectData query path errorHnadle = do
         \c -> liftIO (query_ c query )`catches` errorHnadle
       else return []
 
-addTodo :: (MonadIO m, MonadCatch m) => String -> String -> (String, Bool) -> [Handler m ()] -> m ()
+addTodo :: (MonadIO m, MonadCatch m) => String -> String -> (String, Int) -> [Handler m ()] -> m ()
 addTodo path table (t, d) errorHandl = do
     openDatabase (liftIO $ open path) $ \conn -> 
       liftIO (execute conn ("insert into " <> Query (T.pack table) <> " (title, done) values (?, ?)") (t, d))
       `catches` 
       errorHandl
     
-updateDone :: (MonadIO m, MonadCatch m) => String -> String -> Integer -> Bool -> [Handler m ()] -> m ()
+updateDone :: (MonadIO m, MonadCatch m) => String -> String -> Integer -> Int -> [Handler m ()] -> m ()
 updateDone path table i b errorHandl = do
     openDatabase (liftIO $ open path) $ \conn -> 
-      liftIO (executeNamed conn ("UPDATE " <> Query (T.pack table) <> "SET done = :done WHERE id = :id") [":done" := (b :: Bool), ":id" := i])
+      liftIO (executeNamed conn ("UPDATE " <> Query (T.pack table) <> " SET done = :done WHERE id = :id") [":done" := (b :: Int), ":id" := i])
       `catches` 
       errorHandl
 
 updateTitle :: (MonadIO m, MonadCatch m) => String -> String -> Integer -> String -> [Handler m ()] -> m ()
 updateTitle path table i t errorHandl = do
     openDatabase (liftIO $ open path) $ \conn -> 
-      liftIO (executeNamed conn ("UPDATE " <> Query (T.pack table) <> "SET title = :title WHERE id = :id") [":title" := (t :: String), ":id" := i])
+      liftIO (executeNamed conn ("UPDATE " <> Query (T.pack table) <> " SET title = :title WHERE id = :id") [":title" := (t :: String), ":id" := i])
       `catches` 
       errorHandl
 
-updateTodo :: (MonadIO m, MonadCatch m) => String -> String -> Integer -> (String, Bool) -> [Handler m ()] -> m ()
+updateTodo :: (MonadIO m, MonadCatch m) => String -> String -> Integer -> (String, Int) -> [Handler m ()] -> m ()
 updateTodo path table i (t,b) errorHandl = do
     openDatabase (liftIO $ open path) $ \conn -> 
-      liftIO (executeNamed conn ("UPDATE " <> Query (T.pack table) <> "SET title = :title done = :done WHERE id = :id") [":title" := (t :: String), ":done" := (b :: Bool), ":id" := i])
+      liftIO (executeNamed conn ("UPDATE " <> Query (T.pack table) <> " SET title = :title done = :done WHERE id = :id") [":title" := (t :: String), ":done" := (b :: Int), ":id" := i])
       `catches` 
       errorHandl
 

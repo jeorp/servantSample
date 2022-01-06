@@ -98,6 +98,7 @@ test-suite servantSample-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      CrudSqliteSpec
       Paths_servantSample
   hs-source-dirs:
       test

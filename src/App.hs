@@ -42,6 +42,12 @@ type API = Get '[HTMLLucid] B.ByteString
 api :: Proxy API
 api = Proxy
 
+data Config = Config 
+  {
+      _dbPath :: String,
+      _table :: String
+  }deriving (Show, Eq)
+
 server :: Server API
 server = home
        :<|> serveDirectoryWebApp "static"
@@ -51,7 +57,7 @@ server = home
        :<|> deleteTodoId
   where
     home = liftIO $ B.readFile "templates/index.html"
-    getToDoAll = pure [Todo 1 "sample" False ""]
+    getToDoAll = pure [Todo 1 "sample" 0 ""]
     postTodo todo = pure todo
     putTodoId id todo = pure ()
     deleteTodoId id = pure ()
