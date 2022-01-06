@@ -26,6 +26,7 @@ source-repository head
 library
   exposed-modules:
       App
+      Common
       CrudSqlite
       MkTodoJquery
       Model
@@ -49,6 +50,7 @@ library
     , http-media
     , lens
     , lucid
+    , mtl
     , safe-exceptions
     , servant
     , servant-client
@@ -81,6 +83,7 @@ executable servantSample-exe
     , http-media
     , lens
     , lucid
+    , mtl
     , safe-exceptions
     , servant
     , servant-client
@@ -116,6 +119,7 @@ test-suite servantSample-test
     , http-media
     , lens
     , lucid
+    , mtl
     , safe-exceptions
     , servant
     , servant-client

@@ -4,6 +4,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 module App where
 
@@ -13,6 +14,10 @@ import Data.Proxy
 import qualified Data.Text as T
 import qualified Data.Text.IO as T 
 import qualified Data.ByteString.Lazy as B
+import Control.Arrow 
+import Control.Lens ((^.), to)
+import Control.Monad.Reader
+import Database.SQLite.Simple
 import Servant.API
 import Servant.Server
 import Servant.Server.StaticFiles
@@ -22,6 +27,8 @@ import qualified Network.Wai.Handler.Warp as Warp
 
 import Todo
 import Model
+import Common
+import CrudSqlite
 
 data HTMLLucid
 
@@ -42,14 +49,8 @@ type API = Get '[HTMLLucid] B.ByteString
 api :: Proxy API
 api = Proxy
 
-data Config = Config 
-  {
-      _dbPath :: String,
-      _table :: String
-  }deriving (Show, Eq)
-
-server :: Server API
-server = home
+readerServer :: ServerT API (ReaderT Config Handler)
+readerServer = home
        :<|> serveDirectoryWebApp "static"
        :<|> getToDoAll
        :<|> postTodo
@@ -57,12 +58,23 @@ server = home
        :<|> deleteTodoId
   where
     home = liftIO $ B.readFile "templates/index.html"
-    getToDoAll = pure [Todo 1 "sample" 0 ""]
-    postTodo todo = pure todo
-    putTodoId id todo = pure ()
-    deleteTodoId id = pure ()
+    getToDoAll = do
+        config <- ask
+        selectData (Query (T.pack ("select * from " <> config ^. table <> ";") )) (config ^. dbPath) []
+    postTodo todo = do
+        config <- ask
+        addTodo (config ^. dbPath) (config ^. table) ((^. title) &&& (^. done . to intToByte) $ todo) []
+    putTodoId id todo = do
+        config <- ask
+        updateTodo (config ^. dbPath) (config ^. table) id ((^. title) &&& (^. done . to intToByte) $ todo) []
+    deleteTodoId id = do
+        config <- ask
+        deleteTodo (config ^. dbPath) (config ^. table) id []
+    intToByte :: Int -> Int
+    intToByte n = if n > 0 then 1 else 0
 
 start :: IO ()
 start = do
   putStrLn "Listening on port 8080"
+  let server = hoistServer api (`runReaderT` defaultConfig) readerServer
   Warp.run 8080 $ serve api server

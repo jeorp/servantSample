@@ -12,7 +12,7 @@ import Todo
 import Model
 
 getTodoAll   :: ClientM [Todo]
-postTodo     :: Todo -> ClientM Todo
+postTodo     :: Todo -> ClientM ()
 putTodoId    :: Int -> Todo -> ClientM ()
 deleteTodoId :: Int -> ClientM ()
 

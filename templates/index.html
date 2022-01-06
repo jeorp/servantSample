@@ -8,6 +8,7 @@
     <tr>
       <th> Todo </th>
       <th> Done </th>
+      <th> Created_at </th>
     </tr>
   </table>
 
@@ -23,7 +24,8 @@ getTodoAll(function(todoList){
       checkbox.attr("checked", "checked");
     }
     var done  = $("<td />").append(checkbox);
-    var tr = $("<tr />").append(title).append(done);
+    var created_at = $("<td />").text(todo._created_at)
+    var tr = $("<tr />").append(title).append(done).append(created_at);
     table.append(tr);
   });
 });

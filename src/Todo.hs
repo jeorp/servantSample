@@ -21,7 +21,7 @@ instance FromForm Todo where
               <*> parseUnique "created_at" form
 
 type CRUD =    "todo" :> "all" :> Get '[JSON] [Todo]
-          :<|> "todo" :> ReqBody '[JSON, FormUrlEncoded] Todo :> Post '[JSON] Todo
+          :<|> "todo" :> ReqBody '[JSON, FormUrlEncoded] Todo :> Post '[JSON] ()
           :<|> "todo" :> Capture "id" Int :> ReqBody '[JSON, FormUrlEncoded] Todo :> Put '[JSON] ()
           :<|> "todo" :> Capture "id" Int :> Delete '[JSON] ()
 
