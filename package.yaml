@@ -21,6 +21,26 @@ description:         Please see the README on GitHub at <https://github.com/gith
 
 dependencies:
 - base >= 4.7 && < 5
+- text
+- bytestring
+- directory
+- safe-exceptions
+- warp
+- servant
+- servant-server
+- servant-client
+- servant-js
+- servant-lucid
+- lucid
+- sqlite-simple
+- aeson
+- lens
+- http-api-data
+- http-media
+- http-client
+- http-conduit
+- hspec
+- QuickCheck
 
 library:
   source-dirs: src
