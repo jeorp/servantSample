@@ -6,11 +6,25 @@
 
   <table id="js-todo-list" border=1>
     <tr>
+      <th> ID </th>
       <th> Todo </th>
       <th> Done </th>
       <th> Created_at </th>
     </tr>
   </table>
+
+  <form action="/todo" method="post">
+    <div>
+      <input type="hidden" name="todoId" value="0">
+      <label>
+        Create Todo 
+        <input type="text" name="title">
+      </label>
+      <input type="hidden" name="done" value="1">
+      <input type="hidden" name="created_at" value="0">
+    </div>
+    <button type="submit">送信</button>
+  </form>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
   <script src="/static/todo_crud.js"></script>
@@ -18,14 +32,17 @@
 getTodoAll(function(todoList){
   var table = $("table#js-todo-list");
   todoList.forEach(function(todo){
+    var id = $("<td />").text(todo._todoId)
     var title = $("<td />").text(todo._title);
     var checkbox = $("<input />").attr("type", "checkbox");
-    if (todo._done) {
+    if (todo._done == 0) {
       checkbox.attr("checked", "checked");
     }
     var done  = $("<td />").append(checkbox);
     var created_at = $("<td />").text(todo._created_at)
-    var tr = $("<tr />").append(title).append(done).append(created_at);
+
+
+    var tr = $("<tr />").append(id).append(title).append(done).append(created_at);
     table.append(tr);
   });
 });

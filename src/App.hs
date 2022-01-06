@@ -63,13 +63,15 @@ readerServer = home
         selectData (Query (T.pack ("select * from " <> config ^. table <> ";") )) (config ^. dbPath) []
     postTodo todo = do
         config <- ask
+        liftIO $ print todo
         addTodo (config ^. dbPath) (config ^. table) ((^. title) &&& (^. done . to intToByte) $ todo) []
-    putTodoId id todo = do
+    putTodoId i todo = do
         config <- ask
-        updateTodo (config ^. dbPath) (config ^. table) id ((^. title) &&& (^. done . to intToByte) $ todo) []
-    deleteTodoId id = do
+        updateTodo (config ^. dbPath) (config ^. table) i ((^. title) &&& (^. done . to intToByte) $ todo) []
+    deleteTodoId i = do
         config <- ask
-        deleteTodo (config ^. dbPath) (config ^. table) id []
+        liftIO $ print i
+        deleteTodo (config ^. dbPath) (config ^. table) i []
     intToByte :: Int -> Int
     intToByte n = if n > 0 then 1 else 0
 
